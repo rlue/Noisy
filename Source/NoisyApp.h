@@ -39,7 +39,6 @@
 }
 
 @property (strong, nonatomic) NSStatusItem *statusItem;
-@property (assign, nonatomic) BOOL darkModeOn;
 
 - (double)volume;
 - (void)setVolume:(double)newVolume;

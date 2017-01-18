@@ -108,7 +108,7 @@ static NSString *sNoiseVolumeKeyPath = @"NoiseVolume";
 
 - (id)setupStatusMenu
 {
-    self.statusItem   = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
+    self.statusItem       = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
     _statusItem.image = [NSImage imageNamed:@"statusbar_icon.png"];
     [_statusItem.image setTemplate:YES]; // Set blue bg when clicked & enable inverted colors in Dark Mode
     

@@ -130,18 +130,18 @@ static OSStatus sDefaultOutputDeviceChanged(AudioHardwarePropertyID inPropertyID
 
         _isPlaying = YES;
         OSStatus err = AudioQueueNewOutput(&description, sAudioQueueOutputCallback, self, CFRunLoopGetCurrent(), kCFRunLoopCommonModes, 0, &_queue);
-        if (err) { NSLog(@"AudioQueueNewOutput returned %d", err); return; }
+        if (err) { NSLog(@"AudioQueueNewOutput returned %d", (int)err); return; }
 
         NSUInteger i;
         for (i = 0; i < kNumberOfBuffers; i++) {
             err = AudioQueueAllocateBuffer(_queue, kBytesPerBuffer, &_buffer[i]);
-            if (err) { NSLog(@"AudioQueueAllocateBuffer returned %d", err); return; }
+            if (err) { NSLog(@"AudioQueueAllocateBuffer returned %d", (int)err); return; }
 
             [self _processBuffer:_buffer[i]];
         }
 
         err = AudioQueueStart(_queue, NULL);
-        if (err) { NSLog(@"AudioQueueStart returned %d", err); return; }
+        if (err) { NSLog(@"AudioQueueStart returned %d", (int)err); return; }
     }
 }
 

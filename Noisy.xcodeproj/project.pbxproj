@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0408DF68185E843C00F402CF /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0408DF67185E843C00F402CF /* AudioToolbox.framework */; };
+		229995991E2FCE4B00B59E9D /* statusbar_icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 229995981E2FCE4B00B59E9D /* statusbar_icon.png */; };
 		552C29520E04A2CC0048FF6B /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 552C294C0E04A2CC0048FF6B /* main.m */; };
 		552C29530E04A2CC0048FF6B /* NoiseGenerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 552C294E0E04A2CC0048FF6B /* NoiseGenerator.m */; };
 		552C29540E04A2CC0048FF6B /* NoisyApp.m in Sources */ = {isa = PBXBuildFile; fileRef = 552C29510E04A2CC0048FF6B /* NoisyApp.m */; };
@@ -35,6 +36,7 @@
 		089C165DFE840E0CC02AAC07 /* InfoPlist.strings */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = Resources/English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		13E42FB307B3F0F600E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
+		229995981E2FCE4B00B59E9D /* statusbar_icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = statusbar_icon.png; sourceTree = "<group>"; };
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		550C200D1171C44E0098F573 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
@@ -128,6 +130,7 @@
 				552C29640E04A3090048FF6B /* Noisy.sdef */,
 				8D1107310486CEB800E47090 /* Info.plist */,
 				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
+				229995981E2FCE4B00B59E9D /* statusbar_icon.png */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -218,6 +221,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				229995991E2FCE4B00B59E9D /* statusbar_icon.png in Resources */,
 				8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */,
 				552C29650E04A3090048FF6B /* Noisy.sdef in Resources */,
 				552C29A30E04A4900048FF6B /* Credits.rtf in Resources */,

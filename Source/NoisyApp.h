@@ -38,14 +38,12 @@
     int previousNoiseType; // Saves the noise type during 'mute'
 }
 
-- (IBAction)openAboutNoiseColors:(id)sender;
-- (IBAction)openNoisyWebsite:(id)sender;
+@property (strong, nonatomic) NSStatusItem *statusItem;
+@property (assign, nonatomic) BOOL darkModeOn;
 
 - (double)volume;
 - (void)setVolume:(double)newVolume;
 - (int)noiseType;
 - (void)setNoiseType:(int)newNoiseType;
-
-- (void)toggleMute;
 
 @end

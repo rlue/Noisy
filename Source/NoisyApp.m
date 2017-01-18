@@ -39,11 +39,11 @@ static NSString *sNoiseVolumeKeyPath = @"NoiseVolume";
 + (void)initialize
 {
     NSMutableDictionary *defaults = [NSMutableDictionary dictionary];
-
+    
     [defaults setObject:[NSNumber numberWithInteger:BrownNoiseType] forKey:sNoiseTypeKeyPath];
     [defaults setObject:[NSNumber numberWithInteger:BrownNoiseType] forKey:sNoiseTypeKeyPath];
     [defaults setObject:[NSNumber numberWithDouble:0.2] forKey:sNoiseVolumeKeyPath];
-
+    
     [[NSUserDefaults standardUserDefaults] registerDefaults:defaults];
 }
 
@@ -64,9 +64,9 @@ static NSString *sNoiseVolumeKeyPath = @"NoiseVolume";
 - (void)dealloc
 {
     [[[NSWorkspace sharedWorkspace] notificationCenter] removeObserver:self];
-
+    
     [_generator release];
-
+    
     [super dealloc];
 }
 
@@ -101,18 +101,99 @@ static NSString *sNoiseVolumeKeyPath = @"NoiseVolume";
     [_generator setType:newNoiseType];
 }
 
-- (void)toggleMute {
-    if ([self noiseType] != NoNoiseType) {
-        [self setNoiseType:NoNoiseType];
-    }
-    else {
-        [self setNoiseType:previousNoiseType];
-    }
-}
-
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-    [oWindow setReleasedWhenClosed:NO];
+    [self setupStatusMenu];
+}
+
+- (id)setupStatusMenu
+{
+    self.statusItem   = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
+    _statusItem.image = [NSImage imageNamed:@"statusbar_icon.png"];
+    [_statusItem.image setTemplate:YES]; // Set blue bg when clicked & enable inverted colors in Dark Mode
+    
+    NSMenu *menu       = [[NSMenu alloc] init];
+    NSArray *menuItems = [self menuItems];
+    
+    for(int i = 0; i < [menuItems count]; i++) {
+        [menu addItem:[menuItems objectAtIndex:i]];
+    }
+    _statusItem.menu = menu;
+    return _statusItem;
+}
+
+- (id)menuItems
+{
+    NSMutableArray *menuItems = [NSMutableArray array];
+    
+    [menuItems addObject:[[NSMenuItem alloc] initWithTitle:@"About Noisy"  // About
+                                                    action:@selector(orderFrontStandardAboutPanel:)
+                                             keyEquivalent:@""]];
+    [menuItems addObject:[NSMenuItem separatorItem]];                     // Divider
+    [menuItems addObject:[self menuTypesSubmenu]];                        // Noise Color
+    [menuItems addObject:[[NSMenuItem alloc] initWithTitle:@"Volume"      // Volume Label
+                                                    action:nil
+                                             keyEquivalent:@""]];
+    [menuItems addObject:[self menuVolumeSlider]];                        // Volume Slider
+    [menuItems addObject:[NSMenuItem separatorItem]];                     // Divider
+    [menuItems addObject:[[NSMenuItem alloc] initWithTitle:@"Quit Noisy"  // Quit
+                                                    action:@selector(terminate:)
+                                             keyEquivalent:@""]];
+    
+    return menuItems;
+}
+
+- (id)menuTypesSubmenu
+{
+    NSMenuItem *menuTypes = [[NSMenuItem alloc] init];
+    NSMenu *menuTypesSubmenu  = [[NSMenu alloc] init];
+    
+    NSMutableArray *submenuItems = [NSMutableArray array];
+    NSArray *submenuLabels       = @[@"White", @"Pink", @"Brown"];
+    NSInteger *submenuTags[3]    = {WhiteNoiseType, PinkNoiseType, BrownNoiseType};
+    
+    for(int i = 0; i < [submenuLabels count]; i++) {
+        [submenuItems addObject:[[NSMenuItem alloc] initWithTitle:[submenuLabels objectAtIndex:i]
+                                                           action:@selector(setTypeAction:)
+                                                    keyEquivalent:@""]];
+        [[submenuItems objectAtIndex:i] setTag:submenuTags[i]];
+        [menuTypesSubmenu addItem:[submenuItems objectAtIndex:i]];
+    }
+    
+    menuTypes.title   = @"Noise Color";
+    menuTypes.submenu = menuTypesSubmenu;
+    return menuTypes;
+}
+
+- (id)menuVolumeSlider
+{
+    NSMenuItem *menuVol   = [[NSMenuItem alloc] init];
+    NSSlider *slider      = [[NSSlider alloc] init];
+    
+    slider.frame          = NSMakeRect ( 0, 0, 180, 20 ); // FIX ME – slider is not centered!
+    slider.action         = @selector(setVolumeAction:);
+    slider.doubleValue    = 0.2;
+    slider.minValue       = 0.0;
+    slider.maxValue       = 1.0;
+    
+    menuVol.view          = slider;
+    return menuVol;
+}
+
+- (BOOL)validateMenuItem:(NSMenuItem*)menuItem
+{
+    if ([menuItem action] == @selector(setTypeAction:))
+        [menuItem setState:([menuItem tag] == [self noiseType]) ? NSOnState : NSOffState];
+    return YES;
+}
+
+- (void)setTypeAction:(id)sender {
+    [self setNoiseType:[sender tag]];
+    [self validateMenuItem:sender];
+}
+
+- (void)setVolumeAction:(id)sender {
+    [_generator setVolume:[sender doubleValue]];
 }
 
 - (BOOL)applicationShouldHandleReopen:(NSApplication *)theApplication hasVisibleWindows:(BOOL)flag
@@ -126,69 +207,6 @@ static NSString *sNoiseVolumeKeyPath = @"NoiseVolume";
     [[NSUserDefaults standardUserDefaults] setInteger:NoNoiseType forKey:sNoiseTypeKeyPath];
 }
 
-// Intercept events that correspond to keyboard commands
-- (void)sendEvent:(NSEvent *)anEvent 
-{
-    if ([anEvent type] == NSKeyDown) {
-        NSString *theKeys = [anEvent charactersIgnoringModifiers];
-        unichar keyChar = 0;        
-        if ([theKeys length] == 0) {
-            return;            // reject dead keys
-        }
-        
-        if ([theKeys length] == 1) {
-            keyChar = [theKeys characterAtIndex:0];
-            
-            // CommandanEventshift arrow will set the volume to max or min
-            if ([anEvent modifierFlags] & NSCommandKeyMask && [anEvent modifierFlags] & NSShiftKeyMask) {
-                if (keyChar == NSLeftArrowFunctionKey || keyChar == NSDownArrowFunctionKey) {
-                    [self setVolume:sNoiseMinVolume];
-                    return;
-                }
-                if (keyChar == NSRightArrowFunctionKey || keyChar == NSUpArrowFunctionKey) {
-                    [self setVolume:sNoiseMaxVolume];
-                    return;
-                }
-            }
-            
-            // Anything else with an arrow will nudge the volume up or down
-            if (keyChar == NSLeftArrowFunctionKey || keyChar == NSDownArrowFunctionKey) {
-                [self setVolume:[self volume] - sNoiseVolumeStepSize];
-                return;
-            }
-            if (keyChar == NSRightArrowFunctionKey || keyChar == NSUpArrowFunctionKey) {
-                [self setVolume:[self volume] + sNoiseVolumeStepSize];
-                return;
-            }
-            
-            //Spacebar toggles mute.
-            if ([anEvent keyCode] == 49) {
-                [self toggleMute];
-                return;
-            }
-        }
-    }
-    
-    [super sendEvent:anEvent];
-}
-
-#pragma mark -
-#pragma mark IBActions
-
-- (IBAction)openAboutNoiseColors:(id)sender
-{
-    NSURL *url = [NSURL URLWithString:@"http://en.wikipedia.org/wiki/Colors_of_noise"];
-    [[NSWorkspace sharedWorkspace] openURL:url];
-}
-
-
-- (IBAction)openNoisyWebsite:(id)sender
-{
-    NSURL *url = [NSURL URLWithString:@"http://github.com/jonshea/Noisy"];
-    [[NSWorkspace sharedWorkspace] openURL:url];
-}
-
-
 #pragma mark -
 #pragma mark AppleScript
 
@@ -196,7 +214,7 @@ static NSString *sNoiseVolumeKeyPath = @"NoiseVolume";
 {
     NoiseType type = [[NSUserDefaults standardUserDefaults] integerForKey:sNoiseTypeKeyPath];
     OSType scriptType;
-
+    
     if (type == WhiteNoiseType) {
         scriptType = 'Nwht';
     } else if (type == PinkNoiseType) {
@@ -204,7 +222,7 @@ static NSString *sNoiseVolumeKeyPath = @"NoiseVolume";
     } else {
         scriptType = 'Nnon';
     }
-
+    
     return [[[NSNumber alloc] initWithUnsignedInteger:scriptType] autorelease];
 }
 
@@ -223,7 +241,7 @@ static NSString *sNoiseVolumeKeyPath = @"NoiseVolume";
     } else {
         type = NoNoiseType;
     }
-
+    
     [[NSUserDefaults standardUserDefaults] setInteger:type forKey:sNoiseTypeKeyPath];
 }
 
@@ -239,11 +257,11 @@ static NSString *sNoiseVolumeKeyPath = @"NoiseVolume";
 - (void)setScriptVolume:(id)volumeAsNumber
 {
     double volume = [volumeAsNumber doubleValue];
-
+    
     volume /= 100.0;
     if (volume > 100.0) volume = 100.0;
     if (volume < 0.0)   volume = 0.0;
-
+    
     [[NSUserDefaults standardUserDefaults] setDouble:volume forKey:sNoiseVolumeKeyPath];
 }
 

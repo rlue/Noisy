@@ -16,11 +16,13 @@ This version is a fork of [@jonshea’s][orig]. The windowed UI has been removed
 
 ![](https://raw.githubusercontent.com/rlue/i/master/noisy/windowed_ui.png)
 
-![](https://raw.githubusercontent.com/rlue/i/master/noisy/app_switcher.png)
+![](https://raw.githubusercontent.com/rlue/i/master/noisy/app_switcher_before.png)
 
 #### After
 
 ![](https://raw.githubusercontent.com/rlue/i/master/noisy/statusbar_ui.png)
+
+![](https://raw.githubusercontent.com/rlue/i/master/noisy/app_switcher_after.png)
 
 Download
 --------
